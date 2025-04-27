@@ -90,4 +90,32 @@
   }
 }
 
+/* Responsive design for mobile */
+@media screen and (max-width: 768px) {
+  .sidenav {
+    width: 100%;
+    height: auto;
+    position: relative;
+  }
+  
+  .content {
+    margin-left: 0;
+    padding: 20px;
+  }
+
+  .message_form {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .message_form__input {
+    margin-bottom: 10px;
+    width: 100%;
+  }
+
+  .message_form__button {
+    width: 100%;
+  }
+}
+
   
