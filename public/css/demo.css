@@ -48,4 +48,46 @@
     margin-left: 200px;
     padding-left: 20px;
   }
+
+  /* For small devices (phones) */
+@media (max-width: 600px) {
+  .sidenav {
+    width: 100%;
+    position: relative;
+  }
+  
+  .content {
+    margin-left: 0;
+    padding-left: 10px;
+  }
+
+  .message_form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .message_form__input {
+    width: 80%;
+    margin-bottom: 10px;
+  }
+
+  .message_form__button {
+    width: 50%;
+  }
+}
+
+/* For medium devices (tablets) */
+@media (max-width: 768px) {
+  .sidenav {
+    width: 60%;
+    position: relative;
+  }
+
+  .content {
+    margin-left: 0;
+    padding-left: 20px;
+  }
+}
+
   

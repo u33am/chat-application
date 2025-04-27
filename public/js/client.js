@@ -61,6 +61,8 @@ socket.on("user disconnected", function (userName) {
 const inputField = document.querySelector(".message_form__input");
 const messageForm = document.querySelector(".message_form");
 const messageBox = document.querySelector(".messages__history");
+const typingIndicator = document.querySelector(".typing-indicator");
+
 
 const addNewMessage = ({ user, message }) => {
   const time = new Date();
@@ -91,6 +93,22 @@ const addNewMessage = ({ user, message }) => {
   messageBox.innerHTML += user === userName ? myMsg : receivedMsg;
 };
 
+// Listen for input in the message field
+inputField.addEventListener("input", () => {
+  // Emit typing event when the user starts typing
+  socket.emit("typing", userName);
+});
+
+// Listen for 'typing' event from other users
+socket.on("typing", (user) => {
+  typingIndicator.innerHTML = `${user} is typing...`;
+});
+
+// Clear the typing indicator when the user stops typing (input loses focus)
+inputField.addEventListener("blur", () => {
+  typingIndicator.innerHTML = "";
+});
+
 messageForm.addEventListener("submit", (e) => {
   e.preventDefault();
   if (!inputField.value) {
@@ -108,3 +126,7 @@ messageForm.addEventListener("submit", (e) => {
 socket.on("chat message", function (data) {
   addNewMessage({ user: data.nick, message: data.message });
 });
+
+
+
+
