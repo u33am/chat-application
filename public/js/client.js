@@ -1,68 +1,56 @@
 //required for front end communication between client and server
 
+// public/js/client.js
+
 const socket = io();
-
 const inboxPeople = document.querySelector(".inbox__people");
-
 
 let userName = "";
 let id;
-const newUserConnected = function (data) {
-    
+let typing = false;
+let typingTimeout;
 
-    //give the user a random unique id
-    id = Math.floor(Math.random() * 1000000);
-    userName = 'user-' +id;
-    //console.log(typeof(userName));   
-    
-
-    //emit an event with the user id
-    socket.emit("new user", userName);
-    //call
-    addToUsersBox(userName);
+const newUserConnected = function () {
+  id = Math.floor(Math.random() * 1000000);
+  userName = 'user-' + id;
+  socket.emit("new user", userName);
+  addToUsersBox(userName);
 };
 
 const addToUsersBox = function (userName) {
-    //This if statement checks whether an element of the user-userlist
-    //exists and then inverts the result of the expression in the condition
-    //to true, while also casting from an object to boolean
-    if (!!document.querySelector(`.${userName}-userlist`)) {
-        return;
-    
-    }
-    
-    //setup the divs for displaying the connected users
-    //id is set to a string including the username
-    const userBox = `
+  if (!!document.querySelector(`.${userName}-userlist`)) {
+    return;
+  }
+
+  const userBox = `
     <div class="chat_id ${userName}-userlist">
       <h5>${userName}</h5>
     </div>
   `;
-    //set the inboxPeople div with the value of userbox
-    inboxPeople.innerHTML += userBox;
+  inboxPeople.innerHTML += userBox;
 };
 
-//call 
+// Call once when loaded
 newUserConnected();
 
-//when a new user event is detected
-socket.on("new user", function (data) {
-  data.map(function (user) {
-          return addToUsersBox(user);
-      });
+// New user connects
+socket.on("new user", function (users) {
+  inboxPeople.innerHTML = '<h4>Active users</h4>'; // Clear and refill
+  users.forEach(user => addToUsersBox(user));
 });
 
-//when a user leaves
+// User disconnects
 socket.on("user disconnected", function (userName) {
-  document.querySelector(`.${userName}-userlist`).remove();
+  const userDiv = document.querySelector(`.${userName}-userlist`);
+  if (userDiv) {
+    userDiv.remove();
+  }
 });
 
-
+// Chat handling
 const inputField = document.querySelector(".message_form__input");
 const messageForm = document.querySelector(".message_form");
 const messageBox = document.querySelector(".messages__history");
-const typingIndicator = document.querySelector(".typing-indicator");
-
 
 const addNewMessage = ({ user, message }) => {
   const time = new Date();
@@ -89,31 +77,12 @@ const addNewMessage = ({ user, message }) => {
     </div>
   </div>`;
 
-  //is the message sent or received
   messageBox.innerHTML += user === userName ? myMsg : receivedMsg;
 };
 
-// Listen for input in the message field
-inputField.addEventListener("input", () => {
-  // Emit typing event when the user starts typing
-  socket.emit("typing", userName);
-});
-
-// Listen for 'typing' event from other users
-socket.on("typing", (user) => {
-  typingIndicator.innerHTML = `${user} is typing...`;
-});
-
-// Clear the typing indicator when the user stops typing (input loses focus)
-inputField.addEventListener("blur", () => {
-  typingIndicator.innerHTML = "";
-});
-
 messageForm.addEventListener("submit", (e) => {
   e.preventDefault();
-  if (!inputField.value) {
-    return;
-  }
+  if (!inputField.value) return;
 
   socket.emit("chat message", {
     message: inputField.value,
@@ -121,10 +90,39 @@ messageForm.addEventListener("submit", (e) => {
   });
 
   inputField.value = "";
+  stopTyping();
 });
 
 socket.on("chat message", function (data) {
   addNewMessage({ user: data.nick, message: data.message });
+});
+
+// Typing handling
+inputField.addEventListener("input", () => {
+  if (!typing) {
+    typing = true;
+    socket.emit("typing", userName);
+    typingTimeout = setTimeout(stopTyping, 3000);
+  } else {
+    clearTimeout(typingTimeout);
+    typingTimeout = setTimeout(stopTyping, 3000);
+  }
+});
+
+function stopTyping() {
+  typing = false;
+  socket.emit("stop typing", userName);
+}
+
+// Typing display
+const fallback = document.querySelector(".fallback");
+
+socket.on("typing", (user) => {
+  fallback.innerHTML = `<p><em>${user} is typing...</em></p>`;
+});
+
+socket.on("stop typing", () => {
+  fallback.innerHTML = '';
 });
 
 
