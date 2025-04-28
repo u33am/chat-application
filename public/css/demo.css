@@ -118,4 +118,29 @@
   }
 }
 
-  
+
+/* Adding fade-in animation for messages */
+.incoming__message, .outgoing__message {
+  opacity: 0;
+  animation: fadeIn 0.5s forwards;
+}
+
+@keyframes fadeIn {
+  100% {
+    opacity: 1;
+  }
+}
+
+.emoji-btn {
+  font-size: 20px;
+  padding: 5px 10px;
+  cursor: pointer;
+  background-color: transparent;
+  border: none;
+  color: #888;
+  transition: color 0.3s;
+}
+
+.emoji-btn:hover {
+  color: #333;
+}

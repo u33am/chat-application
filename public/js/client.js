@@ -125,6 +125,12 @@ socket.on("stop typing", () => {
   fallback.innerHTML = '';
 });
 
+// Emoji button logic
+const emojiBtn = document.querySelector(".emoji-btn");
+
+emojiBtn.addEventListener("click", () => {
+  inputField.value += "😊"; // Append emoji to input field
+});
 
 
 
