@@ -1,7 +1,4 @@
-//required for front end communication between client and server
-
-// public/js/client.js
-
+// required for front end communication between client and server
 const socket = io();
 const inboxPeople = document.querySelector(".inbox__people");
 
@@ -132,5 +129,16 @@ emojiBtn.addEventListener("click", () => {
   inputField.value += "😊"; // Append emoji to input field
 });
 
+// Logout functionality
+const logoutBtn = document.querySelector(".logout-btn");
+
+logoutBtn.addEventListener("click", () => {
+  socket.emit("user disconnected", userName); // Notify server that the user is logging out
+  userName = "";  // Clear the user name
+  inboxPeople.innerHTML = "";  // Clear active user list
+  messageBox.innerHTML = "";  // Clear chat history
+  alert("You have logged out.");
+  window.location.reload();  // Reload the page to reset everything
+});
 
 
